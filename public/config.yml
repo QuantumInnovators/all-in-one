@@ -1,0 +1,99 @@
+# 导航配置文件
+# 分类导航链接
+
+categories:
+  - name: 开发工具
+    icon: code
+    links:
+      - name: kadmin
+        url: https://kadmin.tap4fun.com
+        description: kadmin 容器部署管理平台
+        icon: server
+      - name: Jira
+        url: https://jira.tap4fun.com/secure/Dashboard.jspa
+        description: 任务，bug等...
+        icon: jira
+      - name: GitLab
+        url: https://git.tap4fun.com/p2/gs
+        description: 代码托管平台
+        icon: gitlab
+      - name: Kibana
+        url: https://log.tap4fun.com/app/kibana#/discover?_g=()&_a=(columns:!(_source),index:'6a669840-0cf9-11ea-8781-339c9560a9ba',interval:auto,query:(language:kuery,query:''),sort:!(event_time,desc))
+        description: 日志查询
+        icon: kibana
+      - name: oops
+        url: https://oops.tap4fun.com/desktop
+        description: 运维平台，download db等
+        icon: server-network
+      - name: jumpserver
+        url: https://j.tap4fun.com/core/auth/login/
+        description: 登录跳板机
+        icon: shield-lock
+      - name: DataIn
+        url: https://datain.tap4fun.com/
+        description: BI日志查询
+        icon: chart-bar
+      - name: igame
+        url: https://igame.tap4fun.com/#/
+        description: igame 部署运营平台
+        icon: gamepad
+      - name: dify
+        url: https://dify.tap4fun.com
+        description: dify 平台，自建工作流
+        icon: workflow
+      - name: igame-dev
+        url: https://igame-dev.tap4fun.com
+        description: igame dev 调试地址
+        icon: code-branch
+
+  - name: 文档资源
+    icon: document
+    links:
+      - name: Beta-Panic
+        url: https://docs.google.com/spreadsheets/d/15pIwUabu6YbN5VkOmOXFI89TEgWHE_47r2W2vpgNfls
+        description: 每个版本上线前Panic日志文档
+        icon: table
+      - name: 物理资源列表
+        url: https://docs.google.com/spreadsheets/d/1thv_mQaUqq8tgN-FuOCjInbTm42NrxM6gL1YaZNHdoo/edit#gid=0
+        description: 物理机器，db地址等
+        icon: database
+      - name: Drive-配置
+        url: https://drive.google.com/drive/folders/18fRVYlkXD7hhfQbeYhePDd-upXPF5EyJ
+        description: p2目前所有配置表集合入口
+        icon: folder
+      - name: 游戏服部署统计
+        url: https://docs.google.com/spreadsheets/d/1-9F4HebSKJg0aBIEEZkP-X3DCph9rcXT3CFC1cP15Lg/edit#gid=0
+        description: 部署信息说明
+        icon: chart-line
+      - name: GM 指令
+        url: https://docs.google.com/spreadsheets/d/1vCJd9r9Z50uEwwpcUc-5qlCnasPxpDej2YUnHmplf04/edit?gid=0#gid=0
+        description: gm 指令记录
+        icon: terminal
+
+  - name: 实用工具
+    icon: tools
+    links:
+      - name: postman
+        url: postman://
+        description: 执行 curl 工具
+        icon: postman
+      - name: JSON格式
+        url: https://www.json.cn
+        description: JSON在线编辑
+        icon: code-json
+      - name: Base64
+        url: https://base64.us/
+        description: Base64 在线编码
+        icon: browser
+      - name: Regex101
+        url: https://regex101.com
+        description: 正则表达式测试
+        icon: code-braces 
+  
+  - name: 学习资源
+    icon: book
+    links:
+      - name: wiki
+        url: https://wiki.tap4fun.com/
+        description: 公司的各种文档入口
+        icon: book
