@@ -4,11 +4,39 @@
       <NavLogo />
       <h1>ALL IN ONE</h1>
       <p>收集常用工具和资源的导航页面</p>
+      <div class="current-department" v-if="departmentId !== 'all'">
+        当前部门: {{ getDepartmentName(departmentId) }}
+      </div>
     </div>
     
     <NavSearch @search="handleSearch" />
     
     <div v-if="filteredCategories.length > 0" class="categories">
+      <div v-if="userLinks.length > 0" class="category">
+        <h2 class="category-title">
+          <NavIcon name="browser" />
+          我的自定义链接
+        </h2>
+        <div class="links-grid">
+          <a 
+            v-for="(link, linkIndex) in filteredUserLinks" 
+            :key="`user-${linkIndex}`" 
+            :href="link.url" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            class="link-card"
+          >
+            <div class="link-icon">
+              <NavIcon :name="link.icon" />
+            </div>
+            <div class="link-info">
+              <h3>{{ link.name }}</h3>
+              <p>{{ link.description }}</p>
+            </div>
+          </a>
+        </div>
+      </div>
+      
       <div v-for="(category, index) in filteredCategories" :key="index" class="category">
         <h2 class="category-title">
           <NavIcon :name="category.icon" />
@@ -58,13 +86,31 @@ export default {
     NavLogo,
     NavSearch
   },
+  props: {
+    departmentId: {
+      type: String,
+      default: 'all'
+    }
+  },
   data() {
     return {
-      categories: [],
-      searchQuery: ''
+      allCategories: [],
+      userLinks: [],
+      searchQuery: '',
+      departments: [
+        { id: 'all', name: '全部' },
+        { id: 'dev', name: '研发部门' },
+        { id: 'design', name: '设计部门' },
+        { id: 'marketing', name: '市场部门' },
+        { id: 'operations', name: '运营部门' }
+      ],
+      configLoaded: false
     }
   },
   computed: {
+    categories() {
+      return this.allCategories;
+    },
     filteredCategories() {
       if (!this.searchQuery) {
         // 如果没有搜索查询，返回所有类别和链接
@@ -94,37 +140,96 @@ export default {
         .filter(category => category.filteredLinks.length > 0); // 只保留有匹配链接的类别
       
       return filtered;
+    },
+    filteredUserLinks() {
+      if (!this.searchQuery) {
+        return this.userLinks;
+      }
+      
+      const query = this.searchQuery.toLowerCase();
+      return this.userLinks.filter(link => 
+        link.name.toLowerCase().includes(query) || 
+        link.description.toLowerCase().includes(query) ||
+        link.url.toLowerCase().includes(query)
+      );
     }
   },
   mounted() {
     this.loadConfig();
+    this.loadDepartments();
+    this.loadUserLinks();
   },
   methods: {
-    async loadConfig() {
+    getDepartmentName(id) {
+      const dept = this.departments.find(d => d.id === id);
+      return dept ? dept.name : id;
+    },
+    async loadDepartments() {
       try {
-        // 添加时间戳防止浏览器缓存
         const timestamp = new Date().getTime();
         const response = await fetch(`/config.yml?t=${timestamp}`);
         const yamlText = await response.text();
         
-        // 使用js-yaml解析YAML文本
+        // 解析YAML
         const config = yaml.load(yamlText);
         
-        // 更新数据
-        if (config && config.categories) {
-          this.categories = config.categories;
-        } else {
-          console.error('配置文件格式不正确或为空');
+        if (config && config.departments) {
+          this.departments = config.departments;
         }
       } catch (error) {
+        console.error('加载部门配置失败:', error);
+      }
+    },
+    async loadConfig() {
+      try {
+        console.log('开始加载配置...');
+        const timestamp = new Date().getTime();
+        const response = await fetch(`/config.yml?t=${timestamp}`);
+        const yamlText = await response.text();
+        
+        // 解析YAML
+        const config = yaml.load(yamlText);
+        console.log('加载的配置:', config);
+        
+        if (!config) {
+          throw new Error('配置为空');
+        }
+        
+        let allCategories = [];
+        
+        // 1. 添加全局类别
+        if (config.categories && Array.isArray(config.categories)) {
+          allCategories = [...allCategories, ...config.categories];
+          console.log('添加全局类别后:', allCategories);
+        }
+        
+        // 2. 根据当前部门添加部门特有类别
+        if (this.departmentId === 'all') {
+          // 如果是"all"，添加所有部门的类别
+          const departmentIds = ['dev', 'design', 'marketing', 'operations'];
+          departmentIds.forEach(deptId => {
+            if (config[deptId] && config[deptId].categories && Array.isArray(config[deptId].categories)) {
+              allCategories = [...allCategories, ...config[deptId].categories];
+            }
+          });
+        } else if (config[this.departmentId] && config[this.departmentId].categories && Array.isArray(config[this.departmentId].categories)) {
+          // 添加特定部门的类别
+          allCategories = [...allCategories, ...config[this.departmentId].categories];
+        }
+        
+        console.log('最终类别列表:', allCategories);
+        this.allCategories = allCategories;
+        this.configLoaded = true;
+      } catch (error) {
         console.error('加载配置文件失败:', error);
-        // 加载失败时使用备用数据
+        console.error(error.stack);
         this.loadFallbackData();
       }
     },
     loadFallbackData() {
+      console.log('使用备用数据');
       // 备用数据，当配置文件加载失败时使用
-      this.categories = [
+      this.allCategories = [
         {
           name: '开发工具',
           icon: 'code',
@@ -146,30 +251,6 @@ export default {
               url: 'https://code.visualstudio.com',
               description: '代码编辑器',
               icon: 'code'
-            }
-          ]
-        },
-        {
-          name: '设计资源',
-          icon: 'palette',
-          links: [
-            {
-              name: 'Figma',
-              url: 'https://figma.com',
-              description: '在线设计工具',
-              icon: 'figma'
-            },
-            {
-              name: 'Dribbble',
-              url: 'https://dribbble.com',
-              description: '设计灵感',
-              icon: 'dribbble'
-            },
-            {
-              name: 'Unsplash',
-              url: 'https://unsplash.com',
-              description: '免费高质量图片',
-              icon: 'image'
             }
           ]
         },
@@ -196,35 +277,29 @@ export default {
               icon: 'code'
             }
           ]
-        },
-        {
-          name: '实用工具',
-          icon: 'tools',
-          links: [
-            {
-              name: 'JSON格式化',
-              url: 'https://jsonformatter.curiousconcept.com',
-              description: 'JSON在线格式化工具',
-              icon: 'code-json'
-            },
-            {
-              name: 'Can I Use',
-              url: 'https://caniuse.com',
-              description: '浏览器兼容性查询',
-              icon: 'browser'
-            },
-            {
-              name: 'Regex101',
-              url: 'https://regex101.com',
-              description: '正则表达式测试',
-              icon: 'code-braces'
-            }
-          ]
         }
       ];
+      this.configLoaded = true;
     },
     handleSearch(query) {
       this.searchQuery = query;
+    },
+    loadUserLinks() {
+      const savedLinks = localStorage.getItem('userLinks');
+      if (savedLinks) {
+        this.userLinks = JSON.parse(savedLinks);
+      }
+    }
+  },
+  watch: {
+    departmentId() {
+      // 当部门变化时，重新加载配置并清空搜索
+      this.searchQuery = '';
+      this.loadConfig();
+    },
+    '$route'() {
+      // 路由变化时重新加载用户链接
+      this.loadUserLinks();
     }
   }
 }
@@ -254,6 +329,16 @@ export default {
   font-size: 1.2rem;
   color: #7f8c8d;
   margin: 0;
+}
+
+.current-department {
+  margin-top: 10px;
+  padding: 5px 15px;
+  background-color: #f0f7ff;
+  color: #3498db;
+  border-radius: 20px;
+  display: inline-block;
+  font-weight: 600;
 }
 
 .categories {

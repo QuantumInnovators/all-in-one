@@ -1,6 +1,125 @@
 # 导航配置文件
 # 分类导航链接
 
+# 导航栏配置
+departments:
+  - id: all
+    name: 全部
+    icon: browser
+  - id: dev
+    name: 研发部门
+    icon: code
+  - id: design
+    name: 设计部门
+    icon: palette
+  - id: marketing
+    name: 市场部门
+    icon: book
+  - id: operations
+    name: 运营部门
+    icon: tools
+
+# 部门特有的类别
+dev:
+  categories:
+    - name: 开发工具
+      icon: code
+      links:
+        - name: GitHub
+          url: https://github.com
+          description: 代码托管平台
+          icon: github
+        - name: Stack Overflow
+          url: https://stackoverflow.com
+          description: 程序员问答社区
+          icon: stack-overflow
+        - name: VSCode
+          url: https://code.visualstudio.com
+          description: 代码编辑器
+          icon: code
+    - name: 实用工具
+      icon: tools
+      links:
+        - name: JSON格式化
+          url: https://jsonformatter.curiousconcept.com
+          description: JSON在线格式化工具
+          icon: code-json
+        - name: Can I Use
+          url: https://caniuse.com
+          description: 浏览器兼容性查询
+          icon: browser
+        - name: Regex101
+          url: https://regex101.com
+          description: 正则表达式测试
+          icon: code-braces
+
+design:
+  categories:
+    - name: 设计资源
+      icon: palette
+      links:
+        - name: Figma
+          url: https://figma.com
+          description: 在线设计工具
+          icon: figma
+        - name: Dribbble
+          url: https://dribbble.com
+          description: 设计灵感
+          icon: dribbble
+        - name: Unsplash
+          url: https://unsplash.com
+          description: 免费高质量图片
+          icon: image
+        - name: Coolors
+          url: https://coolors.co
+          description: 配色方案生成器
+          icon: palette
+
+marketing:
+  categories:
+    - name: 市场营销
+      icon: book
+      links:
+        - name: Google Analytics
+          url: https://analytics.google.com
+          description: 网站分析工具
+          icon: browser
+        - name: Mailchimp
+          url: https://mailchimp.com
+          description: 邮件营销平台
+          icon: book
+        - name: Canva
+          url: https://www.canva.com
+          description: 在线设计工具
+          icon: palette
+        - name: Buffer
+          url: https://buffer.com
+          description: 社交媒体管理工具
+          icon: browser
+
+operations:
+  categories:
+    - name: 运维工具
+      icon: tools
+      links:
+        - name: Docker Hub
+          url: https://hub.docker.com
+          description: 容器镜像仓库
+          icon: code
+        - name: Grafana
+          url: https://grafana.com
+          description: 监控与可视化平台
+          icon: browser
+        - name: Jenkins
+          url: https://jenkins.io
+          description: 持续集成工具
+          icon: tools
+        - name: Kubernetes
+          url: https://kubernetes.io
+          description: 容器编排平台
+          icon: code
+
+# 分类导航链接
 categories:
   - name: 开发工具
     icon: code
@@ -45,6 +164,10 @@ categories:
         url: https://igame-dev.tap4fun.com
         description: igame dev 调试地址
         icon: code-branch
+      - name: portainer.io
+        url: http://172.20.160.47:9000/#!/auth
+        description: 客户端跑私服
+        icon: portainer
 
   - name: 文档资源
     icon: document
@@ -70,26 +193,6 @@ categories:
         description: gm 指令记录
         icon: terminal
 
-  - name: 实用工具
-    icon: tools
-    links:
-      - name: postman
-        url: postman://
-        description: 执行 curl 工具
-        icon: postman
-      - name: JSON格式
-        url: https://www.json.cn
-        description: JSON在线编辑
-        icon: code-json
-      - name: Base64
-        url: https://base64.us/
-        description: Base64 在线编码
-        icon: browser
-      - name: Regex101
-        url: https://regex101.com
-        description: 正则表达式测试
-        icon: code-braces 
-  
   - name: 学习资源
     icon: book
     links:
