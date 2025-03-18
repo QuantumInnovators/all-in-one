@@ -42,5 +42,10 @@ categories:
         icon: 链接图标
 ```
 
+### Docker部署
+```shell
+docker rmi all-in-one-app
+docker compose up -d
+```
 ## 许可证
 MIT
