@@ -3,7 +3,7 @@
     <div class="header">
       <NavLogo />
       <h1>ALL IN ONE</h1>
-      <p>收集常用工具和资源的导航页面</p>
+      <p>做个项目-这里是梦开始的地方</p>
     </div>
     
     <NavSearch @search="handleSearch" />
