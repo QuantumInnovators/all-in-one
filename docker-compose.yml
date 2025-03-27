@@ -4,9 +4,16 @@ services:
   app:
     build: .
     container_name: vue-all-in-one
-    network_mode: "host"  # 使用host网络
+      #    network_mode: "host"  # 使用host网络
     restart: unless-stopped
-    environment:
-      - PORT=5000  # serve 将使用这个端口 
+    ports:
+      - 5000:5000
+        #environment:
+        #- PORT=5000  # serve 将使用这个端口 
     volumes:
       - ./public/config.yml:/app/config.yml 
+    networks:
+      - traefik
+networks:
+  traefik:
+    external: true
