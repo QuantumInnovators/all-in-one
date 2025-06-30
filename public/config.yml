@@ -9,6 +9,14 @@ categories:
         url: https://kadmin.tap4fun.com
         description: kadmin 容器部署管理平台
         icon: server
+      - name: Web Tool
+        url: https://p2-inner.tap4fun.com
+        description: 内存配置表查看修改工具 
+        icon: server
+      - name: Token 申请
+        url: https://apply.tap4fun.com/home
+        description: GM执行申请Token地址 
+        icon: server
       - name: Jira
         url: https://jira.tap4fun.com/secure/Dashboard.jspa
         description: 任务，bug等...
@@ -45,6 +53,14 @@ categories:
         url: https://igame-dev.tap4fun.com
         description: igame dev 调试地址
         icon: code-branch
+      - name: portainer.io
+        url: http://172.20.160.47:9000/#!/auth
+        description: 客户端跑私服
+        icon: portainer
+      - name: curl-web
+        url: http://172.20.160.47:5173
+        description: 批量执行curl
+        icon: web
 
   - name: 文档资源
     icon: document
