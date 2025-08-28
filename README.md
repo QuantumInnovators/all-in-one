@@ -42,5 +42,11 @@ categories:
         icon: 链接图标
 ```
 
+### 更新
+```
+docker-compose down
+docker-compose up --build -d
+```
+
 ## 许可证
 MIT

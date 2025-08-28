@@ -47,7 +47,6 @@
 
 <script>
 import NavIcon from './Icon.vue';
-import NavLogo from './NavLogo.vue';
 import NavSearch from './NavSearch.vue';
 import yaml from 'js-yaml';
 
@@ -55,7 +54,6 @@ export default {
   name: 'NavLinks',
   components: {
     NavIcon,
-    NavLogo,
     NavSearch
   },
   data() {
