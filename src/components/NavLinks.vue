@@ -2,10 +2,10 @@
   <div class="nav-container">
     <div class="env-switcher">
       <a v-if="isQaView" href="/">
-        <NavIcon name="arrow-left" />主页
+        <NavIcon name="arrow-left" /> 返回开发
       </a>
       <a v-else href="/qa">
-        <NavIcon name="arrow-left" />QA专用
+        <NavIcon name="code-branch" /> 进入测试
       </a>
     </div>
 
@@ -37,7 +37,8 @@
       <div v-for="(category, index) in filteredCategories" :key="index" class="category">
         <h2 class="category-title">
           <NavIcon :name="category.icon" />
-          {{ category.name }}
+          <span>{{ category.name }}</span>
+          <button class="add-link-btn" @click="openAddModal(category.name)">+</button>
         </h2>
         <div class="links-grid">
           <a 
@@ -68,61 +69,65 @@
       <h3>没有找到匹配的结果</h3>
       <p>尝试使用不同的关键词搜索</p>
     </div>
+
+    <!-- 添加链接的弹窗 -->
+    <AddLinkModal 
+      v-if="isModalOpen"
+      :category-name="selectedCategory"
+      @close="closeAddModal"
+      @save="handleAddNewLink"
+    />
   </div>
 </template>
 
 <script>
 import NavIcon from './Icon.vue';
 import NavSearch from './NavSearch.vue';
-import yaml from 'js-yaml';
+import AddLinkModal from './AddLinkModal.vue'; // 引入新组件
 
 export default {
   name: 'NavLinks',
   components: {
     NavIcon,
-    NavSearch
+    NavSearch,
+    AddLinkModal // 注册新组件
   },
   data() {
     return {
       categories: [],
       searchQuery: '',
-      loading: true,  // 添加加载状态
-      error: null    // 添加错误状态
+      loading: true,
+      error: null,
+      isModalOpen: false,
+      selectedCategory: ''
     }
   },
   computed: {
     isQaView() {
       return window.location.pathname.startsWith('/qa');
     },
+    env() {
+      return this.isQaView ? 'qa' : 'dev';
+    },
     filteredCategories() {
       if (!this.searchQuery) {
-        // 如果没有搜索查询，返回所有类别和链接
         return this.categories.map(category => ({
           ...category,
           filteredLinks: category.links
         }));
       }
       
-      // 过滤链接和类别
       const query = this.searchQuery.toLowerCase();
-      const filtered = this.categories
+      return this.categories
         .map(category => {
-          // 过滤每个类别中的链接
           const filteredLinks = category.links.filter(link => 
             link.name.toLowerCase().includes(query) || 
             link.description.toLowerCase().includes(query) ||
             link.url.toLowerCase().includes(query)
           );
-          
-          // 返回包含过滤后链接的类别
-          return {
-            ...category,
-            filteredLinks
-          };
+          return { ...category, filteredLinks };
         })
-        .filter(category => category.filteredLinks.length > 0); // 只保留有匹配链接的类别
-      
-      return filtered;
+        .filter(category => category.filteredLinks.length > 0);
     }
   },
   mounted() {
@@ -130,145 +135,58 @@ export default {
   },
   methods: {
     async loadConfig() {
-      // 重置状态
       this.loading = true;
       this.error = null;
-      
       try {
-        // 根据URL路径决定加载哪个配置文件
-        const isQa = window.location.pathname.startsWith('/qa');
-        const configFile = isQa ? 'config.qa.yml' : 'config.dev.yml';
-        
-        // 添加时间戳防止浏览器缓存
-        const timestamp = new Date().getTime();
-        const response = await fetch(`/${configFile}?t=${timestamp}`);
-        
-        // 检查响应状态
+        const response = await fetch(`/api/config?env=${this.env}`);
         if (!response.ok) {
-          throw new Error(`配置文件加载失败: ${response.status} ${response.statusText}`);
+          const errorData = await response.json();
+          throw new Error(errorData.message || `配置文件加载失败: ${response.status}`);
         }
-        
-        const yamlText = await response.text();
-        
-        // 使用js-yaml解析YAML文本
-        const config = yaml.load(yamlText);
-        
-        // 更新数据
-        if (config && config.categories) {
-          this.categories = config.categories;
+        const data = await response.json();
+        if (data && data.categories) {
+          this.categories = data.categories;
         } else {
           throw new Error('配置文件格式不正确或为空');
         }
       } catch (error) {
         console.error('加载配置文件失败:', error);
         this.error = error.message;
-        // 加载失败时使用备用数据
-        this.loadFallbackData();
       } finally {
-        // 无论成功还是失败，都结束加载状态
         this.loading = false;
       }
     },
-    loadFallbackData() {
-      // 备用数据，当配置文件加载失败时使用
-      this.categories = [
-        {
-          name: '开发工具',
-          icon: 'code',
-          links: [
-            {
-              name: 'GitHub',
-              url: 'https://github.com',
-              description: '代码托管平台',
-              icon: 'github'
-            },
-            {
-              name: 'Stack Overflow',
-              url: 'https://stackoverflow.com',
-              description: '程序员问答社区',
-              icon: 'stack-overflow'
-            },
-            {
-              name: 'VSCode',
-              url: 'https://code.visualstudio.com',
-              description: '代码编辑器',
-              icon: 'code'
-            }
-          ]
-        },
-        {
-          name: '设计资源',
-          icon: 'palette',
-          links: [
-            {
-              name: 'Figma',
-              url: 'https://figma.com',
-              description: '在线设计工具',
-              icon: 'figma'
-            },
-            {
-              name: 'Dribbble',
-              url: 'https://dribbble.com',
-              description: '设计灵感',
-              icon: 'dribbble'
-            },
-            {
-              name: 'Unsplash',
-              url: 'https://unsplash.com',
-              description: '免费高质量图片',
-              icon: 'image'
-            }
-          ]
-        },
-        {
-          name: '学习资源',
-          icon: 'book',
-          links: [
-            {
-              name: 'MDN Web Docs',
-              url: 'https://developer.mozilla.org',
-              description: 'Web开发文档',
-              icon: 'book'
-            },
-            {
-              name: 'Vue.js文档',
-              url: 'https://vuejs.org',
-              description: 'Vue.js官方文档',
-              icon: 'vue'
-            },
-            {
-              name: 'freeCodeCamp',
-              url: 'https://www.freecodecamp.org',
-              description: '免费学习编程',
-              icon: 'code'
-            }
-          ]
-        },
-        {
-          name: '实用工具',
-          icon: 'tools',
-          links: [
-            {
-              name: 'JSON格式化',
-              url: 'https://jsonformatter.curiousconcept.com',
-              description: 'JSON在线格式化工具',
-              icon: 'code-json'
-            },
-            {
-              name: 'Can I Use',
-              url: 'https://caniuse.com',
-              description: '浏览器兼容性查询',
-              icon: 'browser'
-            },
-            {
-              name: 'Regex101',
-              url: 'https://regex101.com',
-              description: '正则表达式测试',
-              icon: 'code-braces'
-            }
-          ]
+    openAddModal(categoryName) {
+      this.selectedCategory = categoryName;
+      this.isModalOpen = true;
+    },
+    closeAddModal() {
+      this.isModalOpen = false;
+      this.selectedCategory = '';
+    },
+    async handleAddNewLink(link) {
+      try {
+        const response = await fetch('/api/config', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            env: this.env,
+            categoryName: this.selectedCategory,
+            link: link
+          }),
+        });
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || '添加链接失败');
         }
-      ];
+        // 添加成功后，重新加载配置以显示新链接
+        await this.loadConfig();
+      } catch (error) {
+        console.error('添加新链接失败:', error);
+        alert(`错误: ${error.message}`); // 简单地用alert提示错误
+      }
     },
     handleSearch(query) {
       this.searchQuery = query;
@@ -345,6 +263,25 @@ export default {
   gap: 10px;
 }
 
+.add-link-btn {
+  background-color: #409eff;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  font-size: 1.2rem;
+  line-height: 28px;
+  text-align: center;
+  cursor: pointer;
+  margin-left: 10px;
+  transition: background-color 0.2s;
+}
+
+.add-link-btn:hover {
+  background-color: #66b1ff;
+}
+
 .links-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -392,30 +329,7 @@ export default {
   color: #7f8c8d;
 }
 
-.no-results {
-  text-align: center;
-  padding: 60px 0;
-  color: #7f8c8d;
-}
-
-.no-results-icon {
-  font-size: 3rem;
-  margin-bottom: 20px;
-  color: #bdc3c7;
-}
-
-.no-results h3 {
-  font-size: 1.5rem;
-  margin-bottom: 10px;
-  color: #2c3e50;
-}
-
-.no-results p {
-  font-size: 1rem;
-}
-
-/* 加载状态样式 */
-.loading {
+.no-results, .loading, .error {
   text-align: center;
   padding: 60px 0;
   color: #7f8c8d;
@@ -436,45 +350,34 @@ export default {
   100% { transform: rotate(360deg); }
 }
 
-/* 错误状态样式 */
-.error {
-  text-align: center;
-  padding: 60px 0;
-  color: #7f8c8d;
-}
-
-.error-icon {
+.error-icon, .no-results-icon {
   font-size: 3rem;
   margin-bottom: 20px;
-  color: #e74c3c;
 }
+.error-icon { color: #e74c3c; }
+.no-results-icon { color: #bdc3c7; }
 
-.error h3 {
+.error h3, .no-results h3 {
   font-size: 1.5rem;
   margin-bottom: 10px;
   color: #2c3e50;
 }
 
-.error p {
-  font-size: 1rem;
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
-
-
 @media (max-width: 768px) {
   .links-grid {
     grid-template-columns: 1fr;
   }
-  
   .header h1 {
     font-size: 2rem;
   }
-  
   .header p {
     font-size: 1rem;
   }
+  .env-switcher a {
+    top: 15px;
+    right: 15px;
+    padding: 4px 8px;
+    font-size: 0.75rem;
+  }
 }
-</style> 
+</style>

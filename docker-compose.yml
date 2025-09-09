@@ -9,4 +9,4 @@ services:
     environment:
       - PORT=5000  # serve 将使用这个端口 
     volumes:
-      - ./public/config.yml:/app/config.yml 
+      - ./public:/app/public 
