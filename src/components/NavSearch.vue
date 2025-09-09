@@ -19,6 +19,19 @@
 <script>
 import NavIcon from './Icon.vue';
 
+// 防抖函数
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
 export default {
   name: 'NavSearch',
   components: {
@@ -26,15 +39,27 @@ export default {
   },
   data() {
     return {
-      searchQuery: ''
+      searchQuery: '',
+      // 创建防抖版本的搜索函数，延迟300ms
+      debouncedSearch: null
     }
+  },
+  mounted() {
+    // 初始化防抖函数
+    this.debouncedSearch = debounce(this.emitSearch, 300);
   },
   methods: {
     onSearch() {
-      this.$emit('search', this.searchQuery);
+      // 使用防抖函数处理搜索
+      this.debouncedSearch(this.searchQuery);
+    },
+    emitSearch(query) {
+      // 实际触发搜索事件
+      this.$emit('search', query);
     },
     clearSearch() {
       this.searchQuery = '';
+      // 立即触发清空搜索
       this.$emit('search', '');
     }
   }

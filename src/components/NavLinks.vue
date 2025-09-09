@@ -1,5 +1,14 @@
 <template>
   <div class="nav-container">
+    <div class="env-switcher">
+      <a v-if="isQaView" href="/">
+        <NavIcon name="arrow-left" />主页
+      </a>
+      <a v-else href="/qa">
+        <NavIcon name="arrow-left" />QA专用
+      </a>
+    </div>
+
     <div class="header">
       <NavLogo />
       <h1>ALL IN ONE</h1>
@@ -8,7 +17,23 @@
     
     <NavSearch @search="handleSearch" />
     
-    <div v-if="filteredCategories.length > 0" class="categories">
+    <!-- 加载状态 -->
+    <div v-if="loading" class="loading">
+      <div class="loading-spinner"></div>
+      <p>正在加载配置...</p>
+    </div>
+    
+    <!-- 错误状态 -->
+    <div v-else-if="error" class="error">
+      <div class="error-icon">
+        <NavIcon name="x" />
+      </div>
+      <h3>加载失败</h3>
+      <p>{{ error }}</p>
+    </div>
+    
+    <!-- 内容显示 -->
+    <div v-else-if="filteredCategories.length > 0" class="categories">
       <div v-for="(category, index) in filteredCategories" :key="index" class="category">
         <h2 class="category-title">
           <NavIcon :name="category.icon" />
@@ -35,6 +60,7 @@
       </div>
     </div>
     
+    <!-- 空结果状态 -->
     <div v-else class="no-results">
       <div class="no-results-icon">
         <NavIcon name="search" />
@@ -59,10 +85,15 @@ export default {
   data() {
     return {
       categories: [],
-      searchQuery: ''
+      searchQuery: '',
+      loading: true,  // 添加加载状态
+      error: null    // 添加错误状态
     }
   },
   computed: {
+    isQaView() {
+      return window.location.pathname.startsWith('/qa');
+    },
     filteredCategories() {
       if (!this.searchQuery) {
         // 如果没有搜索查询，返回所有类别和链接
@@ -99,10 +130,24 @@ export default {
   },
   methods: {
     async loadConfig() {
+      // 重置状态
+      this.loading = true;
+      this.error = null;
+      
       try {
+        // 根据URL路径决定加载哪个配置文件
+        const isQa = window.location.pathname.startsWith('/qa');
+        const configFile = isQa ? 'config.qa.yml' : 'config.dev.yml';
+        
         // 添加时间戳防止浏览器缓存
         const timestamp = new Date().getTime();
-        const response = await fetch(`/config.yml?t=${timestamp}`);
+        const response = await fetch(`/${configFile}?t=${timestamp}`);
+        
+        // 检查响应状态
+        if (!response.ok) {
+          throw new Error(`配置文件加载失败: ${response.status} ${response.statusText}`);
+        }
+        
         const yamlText = await response.text();
         
         // 使用js-yaml解析YAML文本
@@ -112,12 +157,16 @@ export default {
         if (config && config.categories) {
           this.categories = config.categories;
         } else {
-          console.error('配置文件格式不正确或为空');
+          throw new Error('配置文件格式不正确或为空');
         }
       } catch (error) {
         console.error('加载配置文件失败:', error);
+        this.error = error.message;
         // 加载失败时使用备用数据
         this.loadFallbackData();
+      } finally {
+        // 无论成功还是失败，都结束加载状态
+        this.loading = false;
       }
     },
     loadFallbackData() {
@@ -233,6 +282,31 @@ export default {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+  position: relative;
+}
+
+.env-switcher a {
+  position: absolute;
+  top: 25px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background-color: #f0f4f8;
+  border: 1px solid #dcdfe6;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #606266;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.env-switcher a:hover {
+  background-color: #e4e8f0;
+  border-color: #c0c4cc;
+  color: #303133;
 }
 
 .header {
@@ -339,6 +413,56 @@ export default {
 .no-results p {
   font-size: 1rem;
 }
+
+/* 加载状态样式 */
+.loading {
+  text-align: center;
+  padding: 60px 0;
+  color: #7f8c8d;
+}
+
+.loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 3px solid rgba(127, 140, 141, 0.2);
+  border-top: 3px solid #7f8c8d;
+  border-radius: 50%;
+  margin: 0 auto 20px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 错误状态样式 */
+.error {
+  text-align: center;
+  padding: 60px 0;
+  color: #7f8c8d;
+}
+
+.error-icon {
+  font-size: 3rem;
+  margin-bottom: 20px;
+  color: #e74c3c;
+}
+
+.error h3 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: #2c3e50;
+}
+
+.error p {
+  font-size: 1rem;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+
 
 @media (max-width: 768px) {
   .links-grid {

@@ -1,0 +1,35 @@
+# 导航配置文件
+# 分类导航链接
+
+categories:
+  - name: 开发工具
+    icon: code
+    links:
+      - name: kadmin
+        url: https://kadmin.tap4fun.com
+        description: kadmin 容器部署管理平台
+        icon: server
+
+  - name: 文档资源
+    icon: document
+    links:
+      - name: GM 指令
+        url: https://docs.google.com/spreadsheets/d/1vCJd9r9Z50uEwwpcUc-5qlCnasPxpDej2YUnHmplf04/edit?gid=0#gid=0
+        description: gm 指令记录
+        icon: terminal
+
+  - name: 实用工具
+    icon: tools
+    links:
+      - name: JSON格式
+        url: https://www.json.cn
+        description: JSON在线编辑
+        icon: code-json
+  
+  - name: 学习资源
+    icon: book
+    links:
+      - name: wiki
+        url: https://wiki.tap4fun.com/
+        description: 公司的各种文档入口
+        icon: book
