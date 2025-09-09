@@ -2,10 +2,10 @@
   <div class="nav-container">
     <div class="env-switcher">
       <a v-if="isQaView" href="/">
-        <NavIcon name="arrow-left" /> 返回开发
+        <NavIcon name="arrow-left" /> 主页
       </a>
       <a v-else href="/qa">
-        <NavIcon name="code-branch" /> 进入测试
+        <NavIcon name="code-branch" /> QA专用
       </a>
     </div>
 
@@ -89,13 +89,15 @@
       @close="closeEditModal"
       @update="handleUpdateLink"
     />
+
+    
   </div>
 </template>
 
 <script>
 import NavIcon from './Icon.vue';
 import NavSearch from './NavSearch.vue';
-import AddLinkModal from './AddLinkModal.vue'; // 引入新组件
+import AddLinkModal from './AddLinkModal.vue';
 import EditLinkModal from './EditLinkModal.vue';
 
 export default {
@@ -103,7 +105,7 @@ export default {
   components: {
     NavIcon,
     NavSearch,
-    AddLinkModal, // 注册新组件
+    AddLinkModal,
     EditLinkModal
   },
   data() {
@@ -116,7 +118,8 @@ export default {
       selectedCategory: '',
       isEditModalOpen: false,
       editingLink: null,
-      editingCategoryName: null
+      editingCategoryName: null,
+      token: null // Holds the token from localStorage
     }
   },
   computed: {
@@ -149,8 +152,29 @@ export default {
   },
   mounted() {
     this.loadConfig();
+    this.token = localStorage.getItem('api_token') || '';
   },
   methods: {
+    async requestWithAuth(url, options, isRetry = false) {
+      const headers = {
+        ...options.headers,
+        'Authorization': `Bearer ${this.token || ''}`
+      };
+      const newOptions = { ...options, headers };
+
+      const response = await fetch(url, newOptions);
+
+      if ((response.status === 401 || response.status === 403) && !isRetry) {
+        const newToken = prompt('权限不足或密钥错误，请输入访问密钥 (API Token):');
+        if (newToken) {
+          this.token = newToken;
+          localStorage.setItem('api_token', this.token);
+          // Retry the request with the new token
+          return this.requestWithAuth(url, options, true);
+        }
+      }
+      return response;
+    },
     async loadConfig() {
       this.loading = true;
       this.error = null;
@@ -183,11 +207,9 @@ export default {
     },
     async handleAddNewLink(link) {
       try {
-        const response = await fetch('/api/config', {
+        const response = await this.requestWithAuth('/api/config', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             env: this.env,
             categoryName: this.selectedCategory,
@@ -220,11 +242,9 @@ export default {
     },
     async handleUpdateLink(newLinkData) {
       try {
-        const response = await fetch('/api/config', {
+        const response = await this.requestWithAuth('/api/config', {
           method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             env: this.env,
             categoryName: this.editingCategoryName,
@@ -248,11 +268,9 @@ export default {
         return;
       }
       try {
-        const response = await fetch('/api/config', {
+        const response = await this.requestWithAuth('/api/config', {
           method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             env: this.env,
             categoryName: categoryName,
@@ -304,6 +322,8 @@ export default {
   border-color: #c0c4cc;
   color: #303133;
 }
+
+
 
 .header {
   text-align: center;

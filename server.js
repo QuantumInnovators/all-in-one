@@ -12,6 +12,32 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json()); // 用于解析 application/json
 
+// --- 认证中间件 ---
+const authMiddleware = (req, res, next) => {
+  const env = req.body.env;
+  let apiToken;
+
+  if (env === 'qa') {
+    // Use QA token, with a fallback for development
+    apiToken = process.env.API_TOKEN_QA || 'qa-secret-token';
+  } else {
+    // Default to dev token, with a fallback for development
+    apiToken = process.env.API_TOKEN_DEV || 'dev-secret-token';
+  }
+
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'Authorization token is missing or invalid.' });
+  }
+
+  const providedToken = authHeader.split(' ')[1];
+  if (providedToken === apiToken) {
+    next(); // Token is valid, proceed to the route handler
+  } else {
+    res.status(403).json({ message: 'Forbidden: Invalid token.' });
+  }
+};
+
 // --- API 路由 ---
 
 // 获取配置文件的 API
@@ -31,7 +57,7 @@ app.get('/api/config', async (req, res) => {
 });
 
 // 更新配置文件的 API
-app.post('/api/config', async (req, res) => {
+app.post('/api/config', authMiddleware, async (req, res) => {
   console.log('Received request body:', req.body); // 添加这行日志
   const { env, categoryName, link } = req.body;
 
@@ -69,7 +95,7 @@ app.post('/api/config', async (req, res) => {
   }
 });
 
-app.delete('/api/config', async (req, res) => {
+app.delete('/api/config', authMiddleware, async (req, res) => {
   const { env, categoryName, link } = req.body;
 
   if (!env || !categoryName || !link || !link.name || !link.url) {
@@ -106,7 +132,7 @@ app.delete('/api/config', async (req, res) => {
   }
 });
 
-app.put('/api/config', async (req, res) => {
+app.put('/api/config', authMiddleware, async (req, res) => {
   const { env, categoryName, oldLink, newLink } = req.body;
 
   if (!env || !categoryName || !oldLink || !newLink) {

@@ -59,6 +59,10 @@ categories:
         url: http://172.20.160.47:5173
         description: 批量执行curl
         icon: web
+      - name: Kadmin
+        url: https://kadmin.tap4fun.com
+        description: kadmin 容器部署管理平台
+        icon: link
   - name: 文档资源
     icon: document
     links:
