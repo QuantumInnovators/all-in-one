@@ -69,6 +69,80 @@ app.post('/api/config', async (req, res) => {
   }
 });
 
+app.delete('/api/config', async (req, res) => {
+  const { env, categoryName, link } = req.body;
+
+  if (!env || !categoryName || !link || !link.name || !link.url) {
+    return res.status(400).json({ message: 'Missing required fields: env, categoryName, link with name and url' });
+  }
+
+  const validEnv = env === 'qa' ? 'qa' : 'dev';
+  const configFile = `config.${validEnv}.yml`;
+  const filePath = path.join(__dirname, 'public', configFile);
+
+  try {
+    const fileContent = await fs.readFile(filePath, 'utf8');
+    const data = yaml.load(fileContent);
+
+    const category = data.categories.find(c => c.name === categoryName);
+    if (!category) {
+      return res.status(404).json({ message: `Category '${categoryName}' not found.` });
+    }
+
+    const linkIndex = category.links.findIndex(l => l.name === link.name && l.url === link.url);
+    if (linkIndex > -1) {
+      category.links.splice(linkIndex, 1);
+    } else {
+      return res.status(404).json({ message: 'Link not found.' });
+    }
+
+    const newYamlContent = yaml.dump(data);
+    await fs.writeFile(filePath, newYamlContent, 'utf8');
+
+    res.json({ message: 'Link deleted successfully.' });
+  } catch (error) {
+    console.error(`Error processing config file ${filePath}:`, error);
+    res.status(500).json({ message: 'Failed to delete link.' });
+  }
+});
+
+app.put('/api/config', async (req, res) => {
+  const { env, categoryName, oldLink, newLink } = req.body;
+
+  if (!env || !categoryName || !oldLink || !newLink) {
+    return res.status(400).json({ message: 'Missing required fields: env, categoryName, oldLink, newLink' });
+  }
+
+  const validEnv = env === 'qa' ? 'qa' : 'dev';
+  const configFile = `config.${validEnv}.yml`;
+  const filePath = path.join(__dirname, 'public', configFile);
+
+  try {
+    const fileContent = await fs.readFile(filePath, 'utf8');
+    const data = yaml.load(fileContent);
+
+    const category = data.categories.find(c => c.name === categoryName);
+    if (!category) {
+      return res.status(404).json({ message: `Category '${categoryName}' not found.` });
+    }
+
+    const linkIndex = category.links.findIndex(l => l.name === oldLink.name && l.url === oldLink.url);
+    if (linkIndex > -1) {
+      category.links[linkIndex] = newLink;
+    } else {
+      return res.status(404).json({ message: 'Link to update not found.' });
+    }
+
+    const newYamlContent = yaml.dump(data);
+    await fs.writeFile(filePath, newYamlContent, 'utf8');
+
+    res.json({ message: 'Link updated successfully.' });
+  } catch (error) {
+    console.error(`Error processing config file ${filePath}:`, error);
+    res.status(500).json({ message: 'Failed to update link.' });
+  }
+});
+
 app.use(express.static(path.join(__dirname, 'dist'))); // 托管前端文件
 
 // --- SPA 回退 ---

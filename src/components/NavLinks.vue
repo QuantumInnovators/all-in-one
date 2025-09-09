@@ -56,6 +56,10 @@
               <h3>{{ link.name }}</h3>
               <p>{{ link.description }}</p>
             </div>
+                        <div class="link-actions">
+              <button class="edit-link-btn" @click.prevent="openEditModal(link, category.name)">&#9998;</button>
+              <button class="delete-link-btn" @click.prevent="handleDeleteLink(link, category.name)">&times;</button>
+            </div>
           </a>
         </div>
       </div>
@@ -77,6 +81,14 @@
       @close="closeAddModal"
       @save="handleAddNewLink"
     />
+
+    <!-- 编辑链接的弹窗 -->
+    <EditLinkModal
+      v-if="isEditModalOpen"
+      :link-data="editingLink"
+      @close="closeEditModal"
+      @update="handleUpdateLink"
+    />
   </div>
 </template>
 
@@ -84,13 +96,15 @@
 import NavIcon from './Icon.vue';
 import NavSearch from './NavSearch.vue';
 import AddLinkModal from './AddLinkModal.vue'; // 引入新组件
+import EditLinkModal from './EditLinkModal.vue';
 
 export default {
   name: 'NavLinks',
   components: {
     NavIcon,
     NavSearch,
-    AddLinkModal // 注册新组件
+    AddLinkModal, // 注册新组件
+    EditLinkModal
   },
   data() {
     return {
@@ -99,7 +113,10 @@ export default {
       loading: true,
       error: null,
       isModalOpen: false,
-      selectedCategory: ''
+      selectedCategory: '',
+      isEditModalOpen: false,
+      editingLink: null,
+      editingCategoryName: null
     }
   },
   computed: {
@@ -190,6 +207,67 @@ export default {
     },
     handleSearch(query) {
       this.searchQuery = query;
+    },
+    openEditModal(link, categoryName) {
+      this.editingLink = { ...link };
+      this.editingCategoryName = categoryName;
+      this.isEditModalOpen = true;
+    },
+    closeEditModal() {
+      this.isEditModalOpen = false;
+      this.editingLink = null;
+      this.editingCategoryName = null;
+    },
+    async handleUpdateLink(newLinkData) {
+      try {
+        const response = await fetch('/api/config', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            env: this.env,
+            categoryName: this.editingCategoryName,
+            oldLink: this.editingLink,
+            newLink: newLinkData
+          }),
+        });
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || '更新链接失败');
+        }
+        this.closeEditModal();
+        await this.loadConfig();
+      } catch (error) {
+        console.error('更新链接失败:', error);
+        alert(`错误: ${error.message}`);
+      }
+    },
+    async handleDeleteLink(link, categoryName) {
+      if (!confirm(`确定要删除链接 "${link.name}" 吗？`)) {
+        return;
+      }
+      try {
+        const response = await fetch('/api/config', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            env: this.env,
+            categoryName: categoryName,
+            link: link
+          }),
+        });
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || '删除链接失败');
+        }
+        await this.loadConfig();
+      } catch (error) {
+        console.error('删除链接失败:', error);
+        alert(`错误: ${error.message}`);
+      }
     }
   }
 }
@@ -289,6 +367,7 @@ export default {
 }
 
 .link-card {
+  position: relative;
   display: flex;
   align-items: center;
   padding: 15px;
@@ -298,6 +377,41 @@ export default {
   color: inherit;
   transition: transform 0.2s, box-shadow 0.2s;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.link-actions {
+  position: absolute;
+  top: 5px;
+  right: 8px;
+  display: none;
+  gap: 5px;
+}
+
+.link-card:hover .link-actions {
+  display: flex;
+}
+
+.edit-link-btn,
+.delete-link-btn {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  line-height: 1;
+  color: #909399;
+  cursor: pointer;
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.edit-link-btn:hover {
+  color: white;
+  background-color: #409eff;
+}
+
+.delete-link-btn:hover {
+  color: white;
+  background-color: #e74c3c;
 }
 
 .link-card:hover {

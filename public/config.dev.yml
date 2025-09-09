@@ -59,10 +59,6 @@ categories:
         url: http://172.20.160.47:5173
         description: 批量执行curl
         icon: web
-      - name: test
-        url: http://www.google.com
-        description: google
-        icon: link
   - name: 文档资源
     icon: document
     links:
