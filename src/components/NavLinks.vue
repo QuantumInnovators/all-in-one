@@ -4,9 +4,6 @@
       <a v-if="isQaView" href="/">
         <NavIcon name="fas fa-arrow-left" /> 主页
       </a>
-      <a v-else href="/qa">
-        <NavIcon name="fas fa-code-branch" /> QA专用
-      </a>
     </div>
 
     <div class="header">
