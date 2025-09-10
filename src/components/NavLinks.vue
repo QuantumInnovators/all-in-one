@@ -2,10 +2,10 @@
   <div class="nav-container">
     <div class="env-switcher">
       <a v-if="isQaView" href="/">
-        <NavIcon name="arrow-left" /> 主页
+        <NavIcon name="fas fa-arrow-left" /> 主页
       </a>
       <a v-else href="/qa">
-        <NavIcon name="code-branch" /> QA专用
+        <NavIcon name="fas fa-code-branch" /> QA专用
       </a>
     </div>
 
@@ -26,7 +26,7 @@
     <!-- 错误状态 -->
     <div v-else-if="error" class="error">
       <div class="error-icon">
-        <NavIcon name="x" />
+        <NavIcon name="fas fa-xmark" />
       </div>
       <h3>加载失败</h3>
       <p>{{ error }}</p>
@@ -68,7 +68,7 @@
     <!-- 空结果状态 -->
     <div v-else class="no-results">
       <div class="no-results-icon">
-        <NavIcon name="search" />
+        <NavIcon name="fas fa-search" />
       </div>
       <h3>没有找到匹配的结果</h3>
       <p>尝试使用不同的关键词搜索</p>

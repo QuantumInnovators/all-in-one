@@ -1,7 +1,7 @@
 <template>
   <div class="search-container">
     <div class="search-box">
-      <NavIcon name="search" class="search-icon" />
+      <NavIcon name="fas fa-search" class="search-icon" />
       <input 
         type="text" 
         class="search-input" 
@@ -10,7 +10,7 @@
         @input="onSearch"
       />
       <button v-if="searchQuery" class="clear-button" @click="clearSearch">
-        <NavIcon name="x" />
+        <NavIcon name="fas fa-xmark" />
       </button>
     </div>
   </div>

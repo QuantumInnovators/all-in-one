@@ -1,119 +1,115 @@
 categories:
   - name: 开发工具
-    icon: code
+    icon: 'fas fa-code'
     links:
       - name: kadmin
         url: https://kadmin.tap4fun.com
         description: kadmin 容器部署管理平台
-        icon: server
+        icon: 'fas fa-server'
       - name: Web Tool
         url: https://p2-inner.tap4fun.com
         description: 内存配置表查看修改工具
-        icon: server
+        icon: 'fas fa-server'
       - name: Token 申请
         url: https://apply.tap4fun.com/home
         description: GM执行申请Token地址
-        icon: server
+        icon: 'fas fa-server'
       - name: Jira
         url: https://jira.tap4fun.com/secure/Dashboard.jspa
         description: 任务，bug等...
-        icon: jira
+        icon: 'fab fa-jira'
       - name: GitLab
         url: https://git.tap4fun.com/p2/gs
         description: 代码托管平台
-        icon: gitlab
+        icon: 'fab fa-gitlab'
       - name: Kibana
         url: >-
           https://log.tap4fun.com/app/kibana#/discover?_g=()&_a=(columns:!(_source),index:'6a669840-0cf9-11ea-8781-339c9560a9ba',interval:auto,query:(language:kuery,query:''),sort:!(event_time,desc))
         description: 日志查询
-        icon: kibana
+        icon: 'fab fa-kibana'
       - name: oops
         url: https://oops.tap4fun.com/desktop
         description: 运维平台，download db等
-        icon: server-network
+        icon: 'fas fa-network-wired'
       - name: jumpserver
         url: https://j.tap4fun.com/core/auth/login/
         description: 登录跳板机
-        icon: shield-lock
+        icon: 'fas fa-shield-alt'
       - name: DataIn
         url: https://datain.tap4fun.com/
         description: BI日志查询
-        icon: chart-bar
+        icon: 'fas fa-chart-bar'
       - name: igame
         url: https://igame.tap4fun.com/#/
         description: igame 部署运营平台
-        icon: gamepad
+        icon: 'fas fa-gamepad'
       - name: dify
         url: https://dify.tap4fun.com
         description: dify 平台，自建工作流
-        icon: workflow
+        icon: 'fas fa-sitemap'
       - name: igame-dev
         url: https://igame-dev.tap4fun.com
         description: igame dev 调试地址
-        icon: code-branch
+        icon: 'fas fa-code-branch'
       - name: portainer.io
         url: http://172.20.160.47:9000/#!/auth
         description: 客户端跑私服
-        icon: portainer
+        icon: 'fab fa-docker'
       - name: curl-web
         url: http://172.20.160.47:5173
         description: 批量执行curl
-        icon: web
-      - name: Kadmin
-        url: https://kadmin.tap4fun.com
-        description: kadmin 容器部署管理平台
-        icon: link
+        icon: 'fas fa-globe'
   - name: 文档资源
-    icon: document
+    icon: 'fas fa-file-lines'
     links:
       - name: Beta-Panic
         url: >-
           https://docs.google.com/spreadsheets/d/15pIwUabu6YbN5VkOmOXFI89TEgWHE_47r2W2vpgNfls
         description: 每个版本上线前Panic日志文档
-        icon: table
+        icon: 'fas fa-table'
       - name: 物理资源列表
         url: >-
           https://docs.google.com/spreadsheets/d/1thv_mQaUqq8tgN-FuOCjInbTm42NrxM6gL1YaZNHdoo/edit#gid=0
         description: 物理机器，db地址等
-        icon: database
+        icon: 'fas fa-database'
       - name: Drive-配置
         url: >-
           https://drive.google.com/drive/folders/18fRVYlkXD7hhfQbeYhePDd-upXPF5EyJ
         description: p2目前所有配置表集合入口
-        icon: folder
+        icon: 'fas fa-folder'
       - name: 游戏服部署统计
         url: >-
           https://docs.google.com/spreadsheets/d/1-9F4HebSKJg0aBIEEZkP-X3DCph9rcXT3CFC1cP15Lg/edit#gid=0
         description: 部署信息说明
-        icon: chart-line
+        icon: 'fas fa-chart-line'
       - name: GM 指令
         url: >-
           https://docs.google.com/spreadsheets/d/1vCJd9r9Z50uEwwpcUc-5qlCnasPxpDej2YUnHmplf04/edit?gid=0#gid=0
         description: gm 指令记录
-        icon: terminal
+        icon: 'fas fa-terminal'
   - name: 实用工具
-    icon: tools
+    icon: 'fas fa-screwdriver-wrench'
     links:
       - name: postman
         url: postman://
         description: 执行 curl 工具
-        icon: postman
+        icon: 'fas fa-rocket'
       - name: JSON格式
         url: https://www.json.cn
         description: JSON在线编辑
-        icon: code-json
+        icon: 'fas fa-file-code'
       - name: Base64
         url: https://base64.us/
         description: Base64 在线编码
-        icon: browser
+        icon: 'fas fa-window-maximize'
       - name: Regex101
         url: https://regex101.com
         description: 正则表达式测试
-        icon: code-braces
+        icon: 'fas fa-brackets-curly'
   - name: 学习资源
-    icon: book
+    icon: 'fas fa-book'
     links:
       - name: wiki
         url: https://wiki.tap4fun.com/
         description: 公司的各种文档入口
-        icon: book
+        icon: 'fas fa-book'
